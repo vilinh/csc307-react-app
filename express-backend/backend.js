@@ -62,21 +62,31 @@ app.get("/users/:id", (req, res) => {
 });
 
 app.post("/users", (req, res) => {
-    const userToAdd = req.body;
-    addUser(userToAdd);
-    res.status(200).end();
-})
+  const userToAdd = req.body;
+  addUser(userToAdd);
+  res.status(200).end();
+});
+
+app.delete("/users/:id", (req, res) => {
+  const id = req.params["id"];
+  deleteUserById(id);
+  res.status(200).end();
+});
 
 const findUserByName = (name) => {
   return users["users_list"].filter((user) => user["name"] === name);
 };
 
 function findUserById(id) {
-    return users["users_list"].filter((user) => user['id'] === id)
+  return users["users_list"].filter((user) => user["id"] === id);
 }
 
-function addUser(user){
-    users['users_list'].push(user);
+function addUser(user) {
+  users["users_list"].push(user);
+}
+
+function deleteUserById(id) {
+  users["users_list"] = users["users_list"].filter((user) => user["id"] !== id);
 }
 
 app.listen(port, () => {
