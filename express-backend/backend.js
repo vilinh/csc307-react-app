@@ -77,6 +77,12 @@ const findUserByName = (name) => {
   return users["users_list"].filter((user) => user["name"] === name);
 };
 
+function findUserByNameJob(name, job) {
+  return users["users_list"].filter(
+    (user) => user["id"] === id && user["job"] === job
+  );
+}
+
 function findUserById(id) {
   return users["users_list"].filter((user) => user["id"] === id);
 }
