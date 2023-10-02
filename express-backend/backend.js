@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-
+import { v4 as uuidv4 } from "uuid";
 
 const app = express();
 app.use(cors());
@@ -65,15 +65,24 @@ app.get("/users/:id", (req, res) => {
 
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
+  userToAdd["id"] = generateId();
   addUser(userToAdd);
-  res.status(200).end();
+  res.status(201).send({ new_user: userToAdd });
 });
 
 app.delete("/users/:id", (req, res) => {
   const id = req.params["id"];
-  deleteUserById(id);
-  res.status(200).end();
+  let deleted = deleteUserById(id);
+  if (deleted) {
+    res.status(204).end();
+  } else {
+    res.status(404).send("resource not found");
+  }
 });
+
+function generateId() {
+  return uuidv4();
+}
 
 const findUserByName = (name) => {
   return users["users_list"].filter((user) => user["name"] === name);
@@ -94,7 +103,14 @@ function addUser(user) {
 }
 
 function deleteUserById(id) {
-  users["users_list"] = users["users_list"].filter((user) => user["id"] !== id);
+  let userInList = false;
+  users["users_list"] = users["users_list"].filter((user) => {
+    if (user["id"] === id) {
+      userInList = true;
+    }
+    return user["id"] !== id;
+  });
+  return userInList;
 }
 
 app.listen(port, () => {

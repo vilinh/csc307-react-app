@@ -20,7 +20,6 @@ function MyApp() {
     fetchAll().then((result) => {
       if (result) {
         setCharacters(result);
-        console.log(result);
       }
     });
   }, []);
@@ -36,17 +35,36 @@ function MyApp() {
   }
 
   function updateList(person) {
-    makePostCall(person).then(result => {
-      if (result && result.status === 200)
-        setCharacters([...characters, person]);
-    })
+    makePostCall(person).then((result) => {
+      if (result && result.status === 201)
+        setCharacters([...characters, result.data.new_user]);
+    });
   }
 
-  function removeOneCharacter(index) {
-    const updated = characters.filter((character, i) => {
-      return i !== index;
+  async function makeDeleteCall(id) {
+    try {
+      const response = await axios.delete(`http://localhost:8000/users/${id}`);
+      console.log(response);
+      return response;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  }
+
+  function removeOneCharacter(id) {
+    makeDeleteCall(id).then((result) => {
+      if (result && result.status === 204) {
+        fetchAll().then((result) => {
+          if (result) {
+            setCharacters(result);
+          }
+        });
+      } else {
+        console.log("delete error")
+        return false;
+      }
     });
-    setCharacters(updated);
   }
 
   return (
